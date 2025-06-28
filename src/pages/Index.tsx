@@ -5,6 +5,7 @@ import F1Telemetry from '../components/F1Telemetry';
 import F1Timeline from '../components/F1Timeline';
 import F1DriverGrid from '../components/F1DriverGrid';
 import F1LoadingSequence from '../components/F1LoadingSequence';
+import F1HistoricalLaps from '../components/F1HistoricalLaps';
 
 const Index = () => {
   const [speed, setSpeed] = useState(0);
@@ -89,7 +90,7 @@ const Index = () => {
                 { label: 'TELEMETRY', status: 'ACTIVE' },
                 { label: 'TIMELINE', status: 'READY' },
                 { label: 'DRIVERS', status: 'READY' },
-                { label: 'ANALYTICS', status: 'READY' }
+                { label: 'LAP RECORDS', status: 'READY' }
               ].map((item, index) => (
                 <motion.div
                   key={item.label}
@@ -116,37 +117,8 @@ const Index = () => {
         {/* Driver Grid Section */}
         <F1DriverGrid />
 
-        {/* Performance Analytics Section */}
-        <section className="min-h-screen bg-zinc-950 border-t border-zinc-800">
-          <div className="max-w-7xl mx-auto px-6 py-20">
-            <div className="text-center mb-16">
-              <div className="text-red-400 font-mono text-sm tracking-widest mb-4">PERFORMANCE DATA</div>
-              <h2 className="text-4xl md:text-6xl font-black mb-6">ANALYTICS</h2>
-              <div className="text-zinc-400 text-lg">Real-time performance metrics and historical analysis</div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { metric: 'LAP TIME', value: '1:14.260', change: '-0.085' },
-                { metric: 'TOP SPEED', value: '324 KPH', change: '+2.1' },
-                { metric: 'SECTOR 1', value: '18.542', change: '-0.032' }
-              ].map((stat, index) => (
-                <motion.div
-                  key={stat.metric}
-                  className="bg-zinc-900/30 border border-zinc-800 p-8 group hover:border-red-500/30 transition-all duration-300"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="text-xs text-zinc-500 font-mono mb-2">{stat.metric}</div>
-                  <div className="text-3xl font-black text-white mb-2">{stat.value}</div>
-                  <div className="text-green-400 text-sm font-mono">{stat.change}</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Historical Laps Section */}
+        <F1HistoricalLaps />
       </motion.div>
     </div>
   );
