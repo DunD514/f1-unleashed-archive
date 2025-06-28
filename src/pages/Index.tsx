@@ -11,6 +11,7 @@ const Index = () => {
   const [speed, setSpeed] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [scrollY, setScrollY] = useState(0);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +29,17 @@ const Index = () => {
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleSectionClick = (section: string) => {
+    setActiveSection(section);
+    // Scroll to the section
+    setTimeout(() => {
+      const element = document.getElementById(`section-${section}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
 
   if (isLoading) {
     return <F1LoadingSequence />;
@@ -87,10 +99,10 @@ const Index = () => {
             {/* Command buttons */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
               {[
-                { label: 'TELEMETRY', status: 'ACTIVE' },
-                { label: 'TIMELINE', status: 'READY' },
-                { label: 'DRIVERS', status: 'READY' },
-                { label: 'LAP RECORDS', status: 'READY' }
+                { label: 'TELEMETRY', key: 'telemetry', status: 'ACTIVE' },
+                { label: 'TIMELINE', key: 'timeline', status: 'NOT READY' },
+                { label: 'DRIVERS', key: 'drivers', status: 'NOT READY' },
+                { label: 'LAP RECORDS', key: 'laps', status: 'NOT READY' }
               ].map((item, index) => (
                 <motion.div
                   key={item.label}
@@ -99,9 +111,15 @@ const Index = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 + 0.5 }}
+                  onClick={() => item.key !== 'telemetry' && handleSectionClick(item.key)}
                 >
                   <div className="p-6 text-center">
-                    <div className="text-xs text-zinc-500 mb-2 font-mono">{item.status}</div>
+                    <div className={`text-xs mb-2 font-mono ${
+                      item.status === 'ACTIVE' ? 'text-green-400' : 
+                      activeSection === item.key ? 'text-green-400' : 'text-zinc-500'
+                    }`}>
+                      {activeSection === item.key ? 'READY' : item.status}
+                    </div>
                     <div className="text-sm font-semibold tracking-wider">{item.label}</div>
                   </div>
                   <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -111,14 +129,24 @@ const Index = () => {
           </div>
         </header>
 
-        {/* Timeline Section - Professional F1 Style */}
-        <F1Timeline />
+        {/* Conditional Sections */}
+        {activeSection === 'timeline' && (
+          <div id="section-timeline">
+            <F1Timeline />
+          </div>
+        )}
 
-        {/* Driver Grid Section */}
-        <F1DriverGrid />
+        {activeSection === 'drivers' && (
+          <div id="section-drivers">
+            <F1DriverGrid />
+          </div>
+        )}
 
-        {/* Historical Laps Section */}
-        <F1HistoricalLaps />
+        {activeSection === 'laps' && (
+          <div id="section-laps">
+            <F1HistoricalLaps />
+          </div>
+        )}
       </motion.div>
     </div>
   );

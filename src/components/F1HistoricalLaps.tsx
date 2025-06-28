@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Car, User, Zap, Trophy, ArrowRight } from 'lucide-react';
+import { Clock, Car, User, Zap, Trophy, ArrowRight, X } from 'lucide-react';
 
 interface LapRecord {
   id: string;
@@ -134,6 +134,78 @@ const F1HistoricalLaps = () => {
         technology: ['V8 engine', 'KERS', 'DRS', 'Advanced electronics']
       },
       driverBackground: 'Two-time world champion known for his adaptability and ability to maximize any car\'s potential. Considered one of the most complete drivers ever.'
+    },
+    {
+      id: '7',
+      circuit: 'Nürburgring',
+      time: '1:11.526',
+      driver: 'Niki Lauda',
+      car: 'Ferrari 312T2',
+      year: 1976,
+      engine: 'Ferrari V12',
+      topSpeed: '310 km/h',
+      context: 'Heroic qualifying performance just weeks after his near-fatal crash. Lauda\'s courage and determination exemplified the spirit of F1.',
+      carDetails: {
+        weight: '575 kg',
+        power: '480 hp',
+        downforce: 'Basic wings',
+        technology: ['V12 engine', 'Slick tires', 'Manual gearbox', 'Steel chassis']
+      },
+      driverBackground: 'Three-time world champion known for his analytical approach and incredible comeback from his 1976 crash. Nicknamed "The Computer".'
+    },
+    {
+      id: '8',
+      circuit: 'Adelaide',
+      time: '1:16.665',
+      driver: 'Nigel Mansell',
+      car: 'Williams FW14B',
+      year: 1992,
+      engine: 'Renault V10',
+      topSpeed: '330 km/h',
+      context: 'Dominant performance in the championship-winning Williams. The FW14B was one of the most technologically advanced cars of its era.',
+      carDetails: {
+        weight: '505 kg',
+        power: '700 hp',
+        downforce: 'Active suspension',
+        technology: ['V10 engine', 'Active suspension', 'Traction control', 'Advanced electronics']
+      },
+      driverBackground: 'British champion known for his aggressive driving style and never-give-up attitude. Won the 1992 championship in dominant fashion.'
+    },
+    {
+      id: '9',
+      circuit: 'Imola',
+      time: '1:14.548',
+      driver: 'Alain Prost',
+      car: 'McLaren MP4/2B',
+      year: 1985,
+      engine: 'TAG Porsche V6',
+      topSpeed: '305 km/h',
+      context: 'Precise and calculated lap showcasing Prost\'s smooth driving style. His methodical approach earned him the nickname "The Professor".',
+      carDetails: {
+        weight: '540 kg',
+        power: '750 hp',
+        downforce: 'Turbo efficiency',
+        technology: ['Turbo V6', 'Carbon fiber', 'Ground effect', 'Advanced fuel management']
+      },
+      driverBackground: 'Four-time world champion known for his smooth, calculated approach and strategic thinking. Master of tire and fuel management.'
+    },
+    {
+      id: '10',
+      circuit: 'Hockenheim',
+      time: '1:32.238',
+      driver: 'Jim Clark',
+      car: 'Lotus 49',
+      year: 1967,
+      engine: 'Ford Cosworth DFV',
+      topSpeed: '280 km/h',
+      context: 'Legendary performance from one of F1\'s greatest drivers. Clark\'s natural talent and car control were unmatched in his era.',
+      carDetails: {
+        weight: '500 kg',
+        power: '400 hp',
+        downforce: 'Minimal wings',
+        technology: ['V8 engine', 'Monocoque chassis', 'Basic aerodynamics', 'Manual everything']
+      },
+      driverBackground: 'Two-time world champion considered by many as the greatest natural driver ever. Known for his smoothness and incredible car control.'
     }
   ];
 
@@ -195,7 +267,7 @@ const F1HistoricalLaps = () => {
           </div>
 
           {/* Laps Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {historicalLaps.map((lap, index) => {
               const isSelected = selectedLaps.find(l => l.id === lap.id);
               return (
@@ -253,7 +325,7 @@ const F1HistoricalLaps = () => {
         </div>
       </section>
 
-      {/* Comparison Modal */}
+      {/* Enhanced Comparison Modal */}
       <AnimatePresence>
         {showComparison && (
           <motion.div
@@ -272,22 +344,37 @@ const F1HistoricalLaps = () => {
             >
               {/* Header */}
               <div className="flex items-center justify-between p-8 border-b border-zinc-800">
-                <h2 className="text-2xl font-bold text-white">Lap Comparison</h2>
+                <h2 className="text-2xl font-bold text-white">Comprehensive Lap Comparison</h2>
                 <button 
                   onClick={() => setShowComparison(false)}
                   className="text-zinc-400 hover:text-white transition-colors"
                 >
-                  ✕
+                  <X size={24} />
                 </button>
               </div>
 
               {/* Comparison Content */}
               <div className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {/* Quick Stats Comparison */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold text-white mb-4">Performance Overview</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {selectedLaps.map((lap) => (
+                      <div key={lap.id} className="bg-zinc-800/50 border border-zinc-700 p-4 text-center">
+                        <div className="text-2xl font-black text-red-400 mb-2">{lap.time}</div>
+                        <div className="text-white font-bold">{lap.circuit}</div>
+                        <div className="text-zinc-400 text-sm">{lap.year}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Detailed Comparison */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                   {selectedLaps.map((lap, index) => (
                     <div key={lap.id} className="space-y-6">
                       {/* Lap Header */}
-                      <div className="text-center">
+                      <div className="text-center border-b border-zinc-700 pb-4">
                         <div className="text-3xl font-black text-red-400 mb-2">{lap.time}</div>
                         <h3 className="text-xl font-bold text-white">{lap.circuit}</h3>
                         <div className="text-zinc-400">{lap.year}</div>
@@ -299,41 +386,45 @@ const F1HistoricalLaps = () => {
                           <User className="mr-2 text-red-400" size={16} />
                           {lap.driver}
                         </h4>
-                        <p className="text-zinc-300 text-sm">{lap.driverBackground}</p>
+                        <p className="text-zinc-300 text-sm leading-relaxed">{lap.driverBackground}</p>
                       </div>
 
-                      {/* Car Details */}
+                      {/* Car Specifications */}
                       <div className="bg-zinc-800/50 border border-zinc-700 p-4">
-                        <h4 className="text-white font-bold mb-2 flex items-center">
+                        <h4 className="text-white font-bold mb-3 flex items-center">
                           <Car className="mr-2 text-red-400" size={16} />
                           {lap.car}
                         </h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-zinc-400">Weight:</span>
-                            <span className="text-white">{lap.carDetails.weight}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-zinc-400">Power:</span>
-                            <span className="text-white">{lap.carDetails.power}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-zinc-400">Top Speed:</span>
-                            <span className="text-white">{lap.topSpeed}</span>
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="text-zinc-400">Engine:</div>
+                            <div className="text-white">{lap.engine}</div>
+                            <div className="text-zinc-400">Weight:</div>
+                            <div className="text-white">{lap.carDetails.weight}</div>
+                            <div className="text-zinc-400">Power:</div>
+                            <div className="text-white">{lap.carDetails.power}</div>
+                            <div className="text-zinc-400">Top Speed:</div>
+                            <div className="text-white">{lap.topSpeed}</div>
                           </div>
                         </div>
                       </div>
 
                       {/* Technology */}
                       <div className="bg-zinc-800/50 border border-zinc-700 p-4">
-                        <h4 className="text-white font-bold mb-2">Technology</h4>
-                        <div className="space-y-1">
+                        <h4 className="text-white font-bold mb-3">Key Technology</h4>
+                        <div className="space-y-2">
                           {lap.carDetails.technology.map((tech, techIndex) => (
-                            <div key={techIndex} className="text-xs text-zinc-300 font-mono">
-                              • {tech}
+                            <div key={techIndex} className="text-xs text-zinc-300 font-mono bg-zinc-700/50 px-2 py-1 rounded">
+                              {tech}
                             </div>
                           ))}
                         </div>
+                      </div>
+
+                      {/* Context */}
+                      <div className="bg-zinc-800/50 border border-zinc-700 p-4">
+                        <h4 className="text-white font-bold mb-2">Historical Context</h4>
+                        <p className="text-zinc-300 text-sm leading-relaxed">{lap.context}</p>
                       </div>
                     </div>
                   ))}

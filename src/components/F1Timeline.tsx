@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Users, Car, Cpu } from 'lucide-react';
+import { X, Calendar, Users, Car, Cpu, Image, Video, Loader2 } from 'lucide-react';
+import { fetchAdditionalInfo } from '../services/geminiService';
 
 interface TimelineEvent {
   year: string;
@@ -18,6 +18,12 @@ interface TimelineEvent {
 
 const F1Timeline = () => {
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
+  const [additionalInfo, setAdditionalInfo] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [mediaContent, setMediaContent] = useState<{
+    images: string[];
+    videos: string[];
+  }>({ images: [], videos: [] });
 
   const timelineData: TimelineEvent[] = [
     {
@@ -82,6 +88,38 @@ const F1Timeline = () => {
     }
   ];
 
+  const handleEventClick = async (event: TimelineEvent) => {
+    setSelectedEvent(event);
+    setLoading(true);
+    setAdditionalInfo('');
+    setMediaContent({ images: [], videos: [] });
+
+    try {
+      // Fetch comprehensive information
+      const query = `Formula 1 ${event.year} season ${event.title} detailed history, technical specifications, race results, and cultural impact`;
+      const info = await fetchAdditionalInfo(query);
+      setAdditionalInfo(info);
+
+      // Simulate media content (in a real app, you'd fetch actual URLs)
+      setMediaContent({
+        images: [
+          `https://placeholder.com/800x600/FF0000/FFFFFF?text=${event.year}+Season`,
+          `https://placeholder.com/600x400/FF0000/FFFFFF?text=${event.title.replace(/\s+/g, '+')}`,
+          `https://placeholder.com/700x500/FF0000/FFFFFF?text=F1+${event.year}+Cars`
+        ],
+        videos: [
+          `https://placeholder.com/800x450/FF0000/FFFFFF?text=${event.year}+Highlights`,
+          `https://placeholder.com/800x450/FF0000/FFFFFF?text=Documentary+${event.year}`
+        ]
+      });
+    } catch (error) {
+      console.error('Error fetching additional info:', error);
+      setAdditionalInfo('Unable to load additional information.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <section className="min-h-screen bg-zinc-950 border-t border-zinc-800">
@@ -117,7 +155,7 @@ const F1Timeline = () => {
                 {/* Content card */}
                 <div 
                   className="ml-12 md:ml-0 bg-zinc-900/30 border border-zinc-800 hover:border-red-500/30 transition-all duration-300 group cursor-pointer"
-                  onClick={() => setSelectedEvent(event)}
+                  onClick={() => handleEventClick(event)}
                 >
                   <div className="p-8">
                     <div className="flex items-center justify-between mb-4">
@@ -136,7 +174,7 @@ const F1Timeline = () => {
                       {event.description}
                     </p>
 
-                    <div className="text-sm text-red-400 font-mono">CLICK FOR DETAILS →</div>
+                    <div className="text-sm text-red-400 font-mono">CLICK FOR COMPREHENSIVE DETAILS →</div>
                   </div>
                   
                   {/* Data stream effect */}
@@ -148,7 +186,7 @@ const F1Timeline = () => {
         </div>
       </section>
 
-      {/* Detailed Modal */}
+      {/* Enhanced Modal with API Content */}
       <AnimatePresence>
         {selectedEvent && (
           <motion.div
@@ -159,7 +197,7 @@ const F1Timeline = () => {
             onClick={() => setSelectedEvent(null)}
           >
             <motion.div
-              className="bg-zinc-900 border border-zinc-800 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-zinc-900 border border-zinc-800 max-w-6xl w-full max-h-[90vh] overflow-y-auto"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -181,13 +219,48 @@ const F1Timeline = () => {
 
               {/* Content */}
               <div className="p-8 space-y-8">
-                {/* Context */}
+                {/* Media Gallery */}
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                    <Image className="mr-2 text-red-400" size={20} />
+                    Media Gallery
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    {mediaContent.images.map((image, index) => (
+                      <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden">
+                        <img src={image} alt={`${selectedEvent.title} ${index + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {mediaContent.videos.map((video, index) => (
+                      <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden flex items-center justify-center">
+                        <Video className="text-red-400" size={48} />
+                        <span className="ml-2 text-zinc-300">Video {index + 1}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Comprehensive Information */}
                 <div>
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center">
                     <Calendar className="mr-2 text-red-400" size={20} />
-                    Historical Context
+                    Comprehensive Analysis
                   </h3>
-                  <p className="text-zinc-300 leading-relaxed">{selectedEvent.details.context}</p>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="animate-spin text-red-400 mr-2" size={24} />
+                      <span className="text-zinc-300">Loading comprehensive information...</span>
+                    </div>
+                  ) : (
+                    <div className="bg-zinc-800/50 border border-zinc-700 p-6">
+                      <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                        {additionalInfo || selectedEvent.details.context}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Cars */}

@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trophy, Target, Calendar, Flag } from 'lucide-react';
+import { X, Trophy, Target, Calendar, Flag, Image, Video, Loader2 } from 'lucide-react';
+import { fetchDriverMedia } from '../services/geminiService';
 
 interface Driver {
   name: string;
@@ -23,6 +23,12 @@ interface Driver {
 
 const F1DriverGrid = () => {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [driverMedia, setDriverMedia] = useState<{
+    images: string[];
+    videos: string[];
+    biography: string;
+  }>({ images: [], videos: [], biography: '' });
+  const [loading, setLoading] = useState(false);
 
   const drivers: Driver[] = [
     {
@@ -198,6 +204,21 @@ const F1DriverGrid = () => {
     }
   ];
 
+  const handleDriverClick = async (driver: Driver) => {
+    setSelectedDriver(driver);
+    setLoading(true);
+    setDriverMedia({ images: [], videos: [], biography: '' });
+
+    try {
+      const media = await fetchDriverMedia(driver.name);
+      setDriverMedia(media);
+    } catch (error) {
+      console.error('Error fetching driver media:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <section className="min-h-screen bg-zinc-900 border-t border-zinc-800">
@@ -220,7 +241,7 @@ const F1DriverGrid = () => {
                 transition={{ delay: index * 0.1, duration: 0.6 }}
                 viewport={{ once: true }}
                 whileHover={{ scale: 1.02 }}
-                onClick={() => setSelectedDriver(driver)}
+                onClick={() => handleDriverClick(driver)}
               >
                 {/* Driver number header */}
                 <div className={`h-2 bg-gradient-to-r ${driver.color}`}></div>
@@ -256,7 +277,7 @@ const F1DriverGrid = () => {
                     </div>
                   </div>
                   
-                  <div className="text-xs text-red-400 font-mono mt-4">CLICK FOR DETAILS →</div>
+                  <div className="text-xs text-red-400 font-mono mt-4">CLICK FOR MEDIA & DETAILS →</div>
                 </div>
               </motion.div>
             ))}
@@ -264,7 +285,7 @@ const F1DriverGrid = () => {
         </div>
       </section>
 
-      {/* Driver Detail Modal */}
+      {/* Enhanced Driver Detail Modal */}
       <AnimatePresence>
         {selectedDriver && (
           <motion.div
@@ -275,7 +296,7 @@ const F1DriverGrid = () => {
             onClick={() => setSelectedDriver(null)}
           >
             <motion.div
-              className="bg-zinc-900 border border-zinc-800 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-zinc-900 border border-zinc-800 max-w-6xl w-full max-h-[90vh] overflow-y-auto"
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -304,6 +325,52 @@ const F1DriverGrid = () => {
 
               {/* Content */}
               <div className="p-8 space-y-8">
+                {/* Driver Media Gallery */}
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                    <Image className="mr-2 text-red-400" size={20} />
+                    Driver Gallery
+                  </h3>
+                  {loading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="animate-spin text-red-400 mr-2" size={24} />
+                      <span className="text-zinc-300">Loading driver media...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        {driverMedia.images.map((image, index) => (
+                          <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden">
+                            <img src={image} alt={`${selectedDriver.name} ${index + 1}`} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {driverMedia.videos.map((video, index) => (
+                          <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden flex items-center justify-center">
+                            <Video className="text-red-400" size={48} />
+                            <span className="ml-2 text-zinc-300">Race Video {index + 1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Comprehensive Biography */}
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center">
+                    <Calendar className="mr-2 text-red-400" size={20} />
+                    Complete Biography
+                  </h3>
+                  <div className="bg-zinc-800/50 border border-zinc-700 p-6">
+                    <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                      {driverMedia.biography || selectedDriver.career.signature}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Career Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div className="text-center">
