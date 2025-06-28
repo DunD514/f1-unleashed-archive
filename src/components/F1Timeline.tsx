@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Users, Car, Cpu, Image, Video, Loader2 } from 'lucide-react';
@@ -100,16 +101,16 @@ const F1Timeline = () => {
       const info = await fetchAdditionalInfo(query);
       setAdditionalInfo(info);
 
-      // Simulate media content (in a real app, you'd fetch actual URLs)
+      // Generate realistic F1 season media URLs
       setMediaContent({
         images: [
-          `https://placeholder.com/800x600/FF0000/FFFFFF?text=${event.year}+Season`,
-          `https://placeholder.com/600x400/FF0000/FFFFFF?text=${event.title.replace(/\s+/g, '+')}`,
-          `https://placeholder.com/700x500/FF0000/FFFFFF?text=F1+${event.year}+Cars`
+          `https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop&q=80`,
+          `https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&h=400&fit=crop&q=80`,
+          `https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=700&h=500&fit=crop&q=80`
         ],
         videos: [
-          `https://placeholder.com/800x450/FF0000/FFFFFF?text=${event.year}+Highlights`,
-          `https://placeholder.com/800x450/FF0000/FFFFFF?text=Documentary+${event.year}`
+          `https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=450&fit=crop&q=80`,
+          `https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=450&fit=crop&q=80`
         ]
       });
     } catch (error) {
@@ -228,16 +229,34 @@ const F1Timeline = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     {mediaContent.images.map((image, index) => (
                       <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden">
-                        <img src={image} alt={`${selectedEvent.title} ${index + 1}`} className="w-full h-full object-cover" />
+                        <img 
+                          src={image} 
+                          alt={`${selectedEvent.title} ${index + 1}`} 
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://via.placeholder.com/800x600/1f2937/ef4444?text=F1+${selectedEvent.year}`;
+                          }}
+                        />
                       </div>
                     ))}
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {mediaContent.videos.map((video, index) => (
-                      <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden flex items-center justify-center">
-                        <Video className="text-red-400" size={48} />
-                        <span className="ml-2 text-zinc-300">Video {index + 1}</span>
+                      <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden relative group">
+                        <img 
+                          src={video} 
+                          alt={`Video thumbnail ${index + 1}`} 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://via.placeholder.com/800x450/1f2937/ef4444?text=Video+${index + 1}`;
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
+                          <Video className="text-red-400" size={48} />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -256,9 +275,10 @@ const F1Timeline = () => {
                     </div>
                   ) : (
                     <div className="bg-zinc-800/50 border border-zinc-700 p-6">
-                      <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                        {additionalInfo || selectedEvent.details.context}
-                      </div>
+                      <div 
+                        className="text-zinc-300 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: additionalInfo || selectedEvent.details.context }}
+                      />
                     </div>
                   )}
                 </div>

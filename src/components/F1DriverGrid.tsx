@@ -341,16 +341,35 @@ const F1DriverGrid = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         {driverMedia.images.map((image, index) => (
                           <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden">
-                            <img src={image} alt={`${selectedDriver.name} ${index + 1}`} className="w-full h-full object-cover" />
+                            <img 
+                              src={image} 
+                              alt={`${selectedDriver.name} ${index + 1}`} 
+                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = `https://via.placeholder.com/400x500/1f2937/ef4444?text=${selectedDriver.name.replace(/\s+/g, '+')}`;
+                              }}
+                            />
                           </div>
                         ))}
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {driverMedia.videos.map((video, index) => (
-                          <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden flex items-center justify-center">
-                            <Video className="text-red-400" size={48} />
-                            <span className="ml-2 text-zinc-300">Race Video {index + 1}</span>
+                          <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden relative group">
+                            <img 
+                              src={video} 
+                              alt={`Race video thumbnail ${index + 1}`} 
+                              className="w-full h-full object-cover" 
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = `https://via.placeholder.com/800x450/1f2937/ef4444?text=Race+Video+${index + 1}`;
+                              }}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
+                              <Video className="text-red-400" size={48} />
+                              <span className="ml-2 text-zinc-300">Race Highlights</span>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -365,9 +384,10 @@ const F1DriverGrid = () => {
                     Complete Biography
                   </h3>
                   <div className="bg-zinc-800/50 border border-zinc-700 p-6">
-                    <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                      {driverMedia.biography || selectedDriver.career.signature}
-                    </div>
+                    <div 
+                      className="text-zinc-300 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: driverMedia.biography || selectedDriver.career.signature }}
+                    />
                   </div>
                 </div>
 
