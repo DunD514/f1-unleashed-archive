@@ -77,7 +77,7 @@ const Index = () => {
                 F1
               </span>
               <span className="text-white ml-4">DATA</span>
-            </h1>
+            </motion.h1>
             
             <div className="text-xl md:text-2xl text-zinc-400 mb-12 font-light tracking-wide">
               Real-time telemetry • Historical data • Performance analytics
