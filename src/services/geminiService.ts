@@ -1,4 +1,3 @@
-
 const GEMINI_API_KEY = 'AIzaSyC4GK_4jAFp8zYckQvOHTKUxchvqA_ye7U';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
@@ -69,38 +68,39 @@ export const fetchAdditionalInfo = async (query: string): Promise<string> => {
   }
 };
 
-export const fetchDriverMedia = async (driverName: string): Promise<{
+const driverVideoMap: Record<string, string> = {
+  "Lewis Hamilton": "https://www.youtube.com/embed/Rw4vF1Ks8aY",
+  "Max Verstappen": "https://www.youtube.com/embed/lY5j5w9i9Dk", 
+  "Sebastian Vettel": "https://www.youtube.com/embed/0IorQYChMRg",
+  "Fernando Alonso": "https://www.youtube.com/embed/tsOblMG_F_w",
+  "Charles Leclerc": "https://www.youtube.com/embed/6nTM2OQ3M4A",
+  "Lando Norris": "https://www.youtube.com/embed/sRMjlxPJNUo",
+  "Ayrton Senna": "https://www.youtube.com/embed/7W4yqUNY5c8",
+  "Michael Schumacher": "https://www.youtube.com/embed/cNLdW3yMb0c"
+};
+
+export const fetchDriverMedia = async (name: string): Promise<{
   images: string[];
   videos: string[];
   biography: string;
 }> => {
+  const wikiApiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`;
   try {
-    const query = `${driverName} Formula 1 driver comprehensive profile, career highlights, racing history, and achievements`;
-    const response = await fetchAdditionalInfo(query);
-    
-    // Generate realistic F1 driver media URLs
-    const baseImages = [
-      `https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop&crop=faces`,
-      `https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&h=400&fit=crop`,
-      `https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=400&h=300&fit=crop`
-    ];
-    
-    const baseVideos = [
-      `https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=450&fit=crop`,
-      `https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&h=450&fit=crop`
-    ];
-    
+    const res = await fetch(wikiApiUrl);
+    if (!res.ok) throw new Error("Wikipedia fetch failed");
+    const data = await res.json();
+
+    const image = data.thumbnail?.source || "";
+    const bio = data.extract || "";
+    const video = driverVideoMap[name] || "";
+
     return {
-      images: baseImages,
-      videos: baseVideos,
-      biography: response
+      images: image ? [image] : [],
+      videos: video ? [video] : [],
+      biography: bio
     };
   } catch (error) {
-    console.error('Error fetching driver media:', error);
-    return {
-      images: [],
-      videos: [],
-      biography: 'Unable to load driver information.'
-    };
+    console.error("Failed to fetch media for driver", name, error);
+    return { images: [], videos: [], biography: "" };
   }
 };
