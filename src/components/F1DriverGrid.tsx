@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trophy, Target, Calendar, Flag, Image, Video, Loader2 } from 'lucide-react';
@@ -338,30 +339,38 @@ const F1DriverGrid = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {driverMedia.images.map((image, index) => (
-                          <div key={index} className="bg-zinc-800 border border-zinc-700 aspect-video rounded overflow-hidden">
+                          <div key={index} className="bg-zinc-800 border border-zinc-700 rounded overflow-hidden" style={{ height: '300px' }}>
                             <img 
                               src={image} 
                               alt={`${selectedDriver.name} ${index + 1}`} 
-                              className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-300" 
+                              className="w-full h-full object-contain bg-zinc-900 hover:scale-105 transition-transform duration-300" 
                             />
                           </div>
                         ))}
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4">
                         {driverMedia.videos.map((video, index) => (
-                          <video
-                            key={index}
-                            width="100%"
-                            height="315"
-                            controls
-                            className="rounded-lg shadow bg-zinc-800 border border-zinc-700"
-                          >
-                            <source src={video} type="video/mp4" />
-                            Your browser does not support the video tag.
-                          </video>
+                          <div key={index} className="bg-zinc-800 border border-zinc-700 rounded overflow-hidden">
+                            <video
+                              width="100%"
+                              height="400"
+                              controls
+                              className="w-full"
+                              onError={(e) => {
+                                console.error('Video loading error:', e);
+                                console.log('Video source:', video);
+                              }}
+                            >
+                              <source src={video} type="video/mp4" />
+                              <p className="text-zinc-400 p-4">
+                                Your browser does not support the video tag. 
+                                Video path: {video}
+                              </p>
+                            </video>
+                          </div>
                         ))}
                       </div>
                     </>
