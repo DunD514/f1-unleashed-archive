@@ -73,7 +73,7 @@ const driverVideoMap: Record<string, string> = {
   "Max Verstappen": "https://www.youtube.com/embed/lY5j5w9i9Dk", 
   "Sebastian Vettel": "https://www.youtube.com/embed/0IorQYChMRg",
   "Fernando Alonso": "https://www.youtube.com/embed/tsOblMG_F_w",
-  "Charles Leclerc": "https://www.youtube.com/embed/6nTM2OQ3M4A",
+  "Charles Leclerc": "https://www.youtube.com/embed/WFsAHxsU2dc",
   "Lando Norris": "https://www.youtube.com/embed/sRMjlxPJNUo",
   "Ayrton Senna": "https://www.youtube.com/embed/7W4yqUNY5c8",
   "Michael Schumacher": "https://www.youtube.com/embed/cNLdW3yMb0c"
