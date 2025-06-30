@@ -344,7 +344,7 @@ const F1DriverGrid = () => {
                             <img 
                               src={image} 
                               alt={`${selectedDriver.name} ${index + 1}`} 
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
+                              className="w-full h-full object-cover object-center hover:scale-105 transition-transform duration-300" 
                             />
                           </div>
                         ))}
@@ -352,16 +352,16 @@ const F1DriverGrid = () => {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {driverMedia.videos.map((video, index) => (
-                          <iframe
+                          <video
                             key={index}
                             width="100%"
                             height="315"
-                            src={video}
-                            title={`Driver video ${index + 1}`}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
+                            controls
                             className="rounded-lg shadow bg-zinc-800 border border-zinc-700"
-                          />
+                          >
+                            <source src={video} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
                         ))}
                       </div>
                     </>

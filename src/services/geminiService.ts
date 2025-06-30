@@ -79,6 +79,17 @@ const driverVideoMap: Record<string, string> = {
   "Michael Schumacher": "https://www.youtube.com/embed/cNLdW3yMb0c"
 };
 
+const localVideoMap: Record<string, string> = {
+  "Lewis Hamilton": "/driver-videos/lewis-hamilton.mp4",
+  "Max Verstappen": "/driver-videos/max-verstappen.mp4",
+  "Sebastian Vettel": "/driver-videos/sebastian-vettel.mp4",
+  "Fernando Alonso": "/driver-videos/fernando-alonso.mp4",
+  "Charles Leclerc": "/driver-videos/charles-leclerc.mp4",
+  "Lando Norris": "/driver-videos/lando-norris.mp4",
+  "Ayrton Senna": "/driver-videos/ayrton-senna.mp4",
+  "Michael Schumacher": "/driver-videos/michael-schumacher.mp4"
+};
+
 export const fetchDriverMedia = async (name: string): Promise<{
   images: string[];
   videos: string[];
@@ -92,7 +103,7 @@ export const fetchDriverMedia = async (name: string): Promise<{
 
     const image = data.thumbnail?.source || "";
     const bio = data.extract || "";
-    const video = driverVideoMap[name] || "";
+    const video = localVideoMap[name] || "";
 
     return {
       images: image ? [image] : [],
