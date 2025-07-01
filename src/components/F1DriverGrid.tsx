@@ -213,19 +213,6 @@ const F1DriverGrid = () => {
     try {
       const media = await fetchDriverMedia(driver.name);
       console.log('Fetched media for', driver.name, ':', media);
-      console.log('Video URLs being set:', media.videos);
-      
-      // Test if video files are accessible
-      for (const videoUrl of media.videos) {
-        console.log('Testing video accessibility:', videoUrl);
-        try {
-          const response = await fetch(videoUrl, { method: 'HEAD' });
-          console.log(`Video ${videoUrl} accessibility:`, response.ok ? 'OK' : 'NOT FOUND', response.status);
-        } catch (fetchError) {
-          console.error(`Failed to test video ${videoUrl}:`, fetchError);
-        }
-      }
-      
       setDriverMedia(media);
     } catch (error) {
       console.error('Error fetching driver media:', error);
@@ -369,32 +356,22 @@ const F1DriverGrid = () => {
                         {driverMedia.videos.length > 0 ? (
                           driverMedia.videos.map((video, index) => (
                             <div key={index} className="bg-zinc-800 border border-zinc-700 rounded overflow-hidden">
-                              <div className="p-4 text-zinc-400 text-sm space-y-2">
-                                <div>Video path: {video}</div>
-                                <div>Full URL: {window.location.origin + video}</div>
-                                <div>Driver: {selectedDriver.name}</div>
-                              </div>
                               <video
                                 width="100%"
                                 height="400"
                                 controls
                                 preload="metadata"
                                 className="w-full"
-                                onLoadStart={() => {
-                                  console.log('Video load started for:', video);
-                                  console.log('Video element src:', video);
-                                }}
+                                muted
+                                playsInline
+                                crossOrigin="anonymous"
+                                onLoadStart={() => console.log('Video load started for:', video)}
                                 onCanPlay={() => console.log('Video can play:', video)}
                                 onLoadedData={() => console.log('Video data loaded:', video)}
                                 onLoadedMetadata={() => console.log('Video metadata loaded:', video)}
                                 onError={(e) => {
                                   console.error('Video loading error for:', video);
-                                  console.log('Error target:', e.currentTarget);
-                                  console.log('Error details:', e.currentTarget.error);
-                                  console.log('Error code:', e.currentTarget.error?.code);
-                                  console.log('Error message:', e.currentTarget.error?.message);
-                                  console.log('Network state:', e.currentTarget.networkState);
-                                  console.log('Ready state:', e.currentTarget.readyState);
+                                  console.error('Error details:', e.currentTarget.error);
                                 }}
                               >
                                 <source src={video} type="video/mp4" />
