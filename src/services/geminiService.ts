@@ -1,3 +1,4 @@
+
 const GEMINI_API_KEY = 'AIzaSyC4GK_4jAFp8zYckQvOHTKUxchvqA_ye7U';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 
@@ -86,8 +87,8 @@ const localVideoMap: Record<string, string> = {
   "Fernando Alonso": "/driver-videos/fernando-alonso.mp4",
   "Charles Leclerc": "/driver-videos/charles-leclerc.mp4",
   "Lando Norris": "/driver-videos/lando-norris.mp4",
-  "Ayrton Senna": "/driver-videos/ayrton-senna.mp4",
-  "Michael Schumacher": "/driver-videos/michael-schumacher.mp4"
+  "Ayrton Senna": "/driver-videos/artyon-senna.mp4",
+  "Michael Schumacher": "/driver-videos/michael-shumacher.mp4"
 };
 
 export const fetchDriverMedia = async (name: string): Promise<{
