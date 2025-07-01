@@ -212,6 +212,7 @@ const F1DriverGrid = () => {
 
     try {
       const media = await fetchDriverMedia(driver.name);
+      console.log('Fetched media for', driver.name, ':', media);
       setDriverMedia(media);
     } catch (error) {
       console.error('Error fetching driver media:', error);
@@ -354,14 +355,21 @@ const F1DriverGrid = () => {
                       <div className="grid grid-cols-1 gap-4">
                         {driverMedia.videos.map((video, index) => (
                           <div key={index} className="bg-zinc-800 border border-zinc-700 rounded overflow-hidden">
+                            <div className="p-4 text-zinc-400 text-sm">
+                              Video path: {video}
+                            </div>
                             <video
                               width="100%"
                               height="400"
                               controls
+                              preload="metadata"
                               className="w-full"
+                              onLoadStart={() => console.log('Video load started for:', video)}
+                              onCanPlay={() => console.log('Video can play:', video)}
                               onError={(e) => {
                                 console.error('Video loading error:', e);
                                 console.log('Video source:', video);
+                                console.log('Error details:', e.currentTarget.error);
                               }}
                             >
                               <source src={video} type="video/mp4" />

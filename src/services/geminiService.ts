@@ -85,7 +85,7 @@ const localVideoMap: Record<string, string> = {
   "Max Verstappen": "/driver-videos/max-verstappen.mp4",
   "Sebastian Vettel": "/driver-videos/sebastian-vettel.mp4",
   "Fernando Alonso": "/driver-videos/fernando-alonso.mp4",
-  "Charles Leclerc": "/driver-videos/charles-leclerc.mp4",
+  "Charles Leclerc": "/driver-videos/charles-leclerc .mp4",
   "Lando Norris": "/driver-videos/lando-norris.mp4",
   "Ayrton Senna": "/driver-videos/artyon-senna.mp4",
   "Michael Schumacher": "/driver-videos/michael-shumacher.mp4"
