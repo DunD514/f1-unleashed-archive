@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trophy, Target, Calendar, Flag, Image, Video, Loader2 } from 'lucide-react';
+import { X, Trophy, Target, Calendar, Flag, Image, Video, Loader2, Download } from 'lucide-react';
 import { fetchDriverMedia } from '../services/geminiService';
 
 interface Driver {
@@ -30,6 +29,8 @@ const F1DriverGrid = () => {
     biography: string;
   }>({ images: [], videos: [], biography: '' });
   const [loading, setLoading] = useState(false);
+  const [downloadedVideos, setDownloadedVideos] = useState<Record<string, string>>({});
+  const [downloadingVideos, setDownloadingVideos] = useState<Set<string>>(new Set());
 
   const drivers: Driver[] = [
     {
@@ -205,10 +206,54 @@ const F1DriverGrid = () => {
     }
   ];
 
+  const downloadVideo = async (videoUrl: string): Promise<string> => {
+    try {
+      console.log('Starting download for:', videoUrl);
+      const response = await fetch(videoUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video: ${response.status}`);
+      }
+      
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      console.log('Video downloaded and blob URL created:', objectUrl);
+      return objectUrl;
+    } catch (error) {
+      console.error('Error downloading video:', error);
+      throw error;
+    }
+  };
+
+  const handleVideoDownload = async (videoUrl: string, index: number) => {
+    if (downloadedVideos[videoUrl] || downloadingVideos.has(videoUrl)) {
+      return;
+    }
+
+    setDownloadingVideos(prev => new Set(prev).add(videoUrl));
+    
+    try {
+      const blobUrl = await downloadVideo(videoUrl);
+      setDownloadedVideos(prev => ({
+        ...prev,
+        [videoUrl]: blobUrl
+      }));
+    } catch (error) {
+      console.error('Failed to download video:', error);
+    } finally {
+      setDownloadingVideos(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(videoUrl);
+        return newSet;
+      });
+    }
+  };
+
   const handleDriverClick = async (driver: Driver) => {
     setSelectedDriver(driver);
     setLoading(true);
     setDriverMedia({ images: [], videos: [], biography: '' });
+    setDownloadedVideos({});
+    setDownloadingVideos(new Set());
 
     try {
       const media = await fetchDriverMedia(driver.name);
@@ -340,6 +385,7 @@ const F1DriverGrid = () => {
                     </div>
                   ) : (
                     <>
+                      {/* Images section */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {driverMedia.images.map((image, index) => (
                           <div key={index} className="bg-zinc-800 border border-zinc-700 rounded overflow-hidden" style={{ height: '300px' }}>
@@ -352,34 +398,70 @@ const F1DriverGrid = () => {
                         ))}
                       </div>
                       
+                      {/* Videos section */}
                       <div className="grid grid-cols-1 gap-4">
                         {driverMedia.videos.length > 0 ? (
                           driverMedia.videos.map((video, index) => (
                             <div key={index} className="bg-zinc-800 border border-zinc-700 rounded overflow-hidden">
-                              <video
-                                width="100%"
-                                height="400"
-                                controls
-                                preload="metadata"
-                                className="w-full"
-                                muted
-                                playsInline
-                                crossOrigin="anonymous"
-                                onLoadStart={() => console.log('Video load started for:', video)}
-                                onCanPlay={() => console.log('Video can play:', video)}
-                                onLoadedData={() => console.log('Video data loaded:', video)}
-                                onLoadedMetadata={() => console.log('Video metadata loaded:', video)}
-                                onError={(e) => {
-                                  console.error('Video loading error for:', video);
-                                  console.error('Error details:', e.currentTarget.error);
-                                }}
-                              >
-                                <source src={video} type="video/mp4" />
-                                <p className="text-zinc-400 p-4">
-                                  Your browser does not support the video tag. 
-                                  Video path: {video}
-                                </p>
-                              </video>
+                              <div className="p-4 border-b border-zinc-700 flex items-center justify-between">
+                                <div className="text-zinc-300 text-sm">
+                                  Video {index + 1} - {selectedDriver.name}
+                                </div>
+                                <button
+                                  onClick={() => handleVideoDownload(video, index)}
+                                  disabled={downloadingVideos.has(video) || !!downloadedVideos[video]}
+                                  className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 disabled:bg-zinc-600 text-white px-3 py-1 rounded text-sm transition-colors"
+                                >
+                                  {downloadingVideos.has(video) ? (
+                                    <>
+                                      <Loader2 className="animate-spin" size={16} />
+                                      <span>Downloading...</span>
+                                    </>
+                                  ) : downloadedVideos[video] ? (
+                                    <>
+                                      <Video size={16} />
+                                      <span>Ready to Play</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Download size={16} />
+                                      <span>Download Video</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                              
+                              {downloadedVideos[video] && (
+                                <video
+                                  width="100%"
+                                  height="400"
+                                  controls
+                                  preload="metadata"
+                                  className="w-full"
+                                  muted
+                                  playsInline
+                                  src={downloadedVideos[video]}
+                                  onLoadStart={() => console.log('Downloaded video load started for:', video)}
+                                  onCanPlay={() => console.log('Downloaded video can play:', video)}
+                                  onLoadedData={() => console.log('Downloaded video data loaded:', video)}
+                                  onLoadedMetadata={() => console.log('Downloaded video metadata loaded:', video)}
+                                  onError={(e) => {
+                                    console.error('Downloaded video loading error for:', video);
+                                    console.error('Error details:', e.currentTarget.error);
+                                  }}
+                                >
+                                  <p className="text-zinc-400 p-4">
+                                    Your browser does not support the video tag.
+                                  </p>
+                                </video>
+                              )}
+                              
+                              {!downloadedVideos[video] && !downloadingVideos.has(video) && (
+                                <div className="p-8 text-center text-zinc-400">
+                                  <Video size={48} className="mx-auto mb-4 opacity-50" />
+                                  <p>Click "Download Video" to load the video for playback</p>
+                                </div>
+                              )}
                             </div>
                           ))
                         ) : (
